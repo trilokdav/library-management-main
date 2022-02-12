@@ -1,0 +1,321 @@
+<!-- Template for Managing books in the Library Management 
+
+  ###########################################################
+-->
+{% extends 'dashboard.html' %}
+{% block nav_book %}class = "active" {% endblock %}
+
+{% block content %}
+
+<!-- Code For Flashing Message on the screen -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="width:96%; margin-left: 20px;">
+                    <span style="color: black;">{{ message }}</span>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>      
+                  </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+
+ <!-- ------------------------------------------------------------------------------------------- -->
+
+
+ <!-- Navbar -->
+ <div class="container">
+  <div class="row">
+       <form method="POST" action="{{url_for('book')}}">
+      <nav class="navbar navbar-expand-lg navbar-absolute fixed-top navbar-transparent">
+        <div class="container-fluid">
+          <div class="navbar-wrapper">
+            <div class="navbar-toggle">
+              <button type="button" class="navbar-toggler">
+                <span class="navbar-toggler-bar bar1"></span>
+                <span class="navbar-toggler-bar bar2"></span>
+                <span class="navbar-toggler-bar bar3"></span>
+              </button>
+            </div>
+            <a class="navbar-brand" href="javascript:;">Book Details</a>
+          </div>
+          <div class="col-md-8">
+         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#add" >IMPORT BOOKS</button>
+       </div>
+        
+          <div class="collapse navbar-collapse justify-content-end" id="navigation">
+           
+              <div class="input-group no-border">
+                <input type="text"  name="search" id="search" onkeyup="myFunction()" class="form-control" placeholder="Search...">
+                <div class="input-group-append">
+                  <div class="input-group-text">
+                    <i class="nc-icon nc-zoom-split"></i>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </nav>
+    </form>
+
+<!-- Ending for navbar -->
+
+
+<!-- Div started -->
+<div class="container-fluid">
+<div class="row">
+  <div class="col">
+<div class="card">
+  <div class="card-body">
+    <form method="POST" action="{{url_for('book')}}">
+      <!-- Table for Displaying Data -->
+      <div class="table-responsive">
+      <table class="table table-hover table-bordered" id="Mytable">
+	     <thead style="font-weight: bold;" class="text-primary">
+		      <td >Book Id</td>
+		      <td>Title</td>
+		      <td>Author</td>
+		      <td>Ratings</td>
+		      <td>Publisher</td>
+		      <td>Publication Date</td>
+          <td>Stock</td>
+          <td>Update</td>
+          <td>Delete</td>
+	   </thead>
+	{% for i in bdata %}
+      <tbody>
+	     <tr>
+		    <td style="font-weight: bold;" class="text-danger">{{ i['book_id' ] }}</td>
+		    <td>{{ i['title'] }}</td>
+		    <td>{{ i['authors'] }}</td>
+		    <td>{{ i['average_rating'] }}</td>
+        <td>{{ i['publisher'] }}</td>
+        <td>{{ i['publication_date'] }}</td>
+        <td>{{ i['stock'] }}</td>
+        <td><button type="button" class="btn btn-info" data-toggle="modal" data-target="#update{{ i['book_id' ] }}">UPDATE</button></td>
+		    <td><button type="submit" class="btn btn-danger" name="del" value="{{ i['book_id' ] }}">DELETE</button></td>
+	   </tr>
+    </tbody>
+{% endfor %}
+      </table>
+    </form>
+  </div>
+  </div>
+</div>
+</div>
+</div>
+<!-- Table End -->
+
+
+<!-- Modal body for updating the details of books -->
+
+ {% for item in bdata%}
+<div class="modal" id="update{{ item['book_id' ] }}" tabindex="-1" role="dialog" aria-labelledby="update{{ item['book_id' ] }}" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">                       
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="update{{ item['book_id' ] }}">UPDATE BOOK DETAILS</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>     
+                                    </button>
+                                          </div>
+                                          <form method="POST" action="{{url_for('book')}}">
+                                          <div class="modal-body">
+                                              <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">BOOK ID :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text"  class="form-control" value="{{item['book_id']}}" readonly>
+                                                </div>
+                                           </div>
+                                              <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">TITLE :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="title"  class="form-control" value="{{item['title']}}" >
+                                                </div>
+                                           </div>
+                                            <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">AUTHORS :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="author" class="form-control" value="{{item['authors']}}">
+                                                </div>
+                                              </div>
+                                              <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">AVERAGE RATING :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="rating" value="{{item['average_rating']}}" class="form-control">
+                                                </div>
+                                              </div>
+                                             <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">ISBN :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="isbn" value="{{item['isbn']}}" class="form-control">
+                                                </div>
+                                              </div>
+                                              <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">ISBN 13:</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="isbn13" value="{{item['isbn13']}}" class="form-control">
+                                                </div>
+                                              </div>
+                                               <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">LANGUAGE CODE :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="lcode" class="form-control" value="{{item['language_code']}}">
+                                                </div>
+                                              </div>
+                                               <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">No. OF PAGES :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="pages" class="form-control" value="{{item['num_pages']}}">
+                                                </div>
+                                              </div>
+                                               <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">RATINGS COUNT :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="rcount" class="form-control" value="{{item['ratings_count']}}">
+                                                </div>
+                                              </div>
+                                               <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">TEXT REVIEW COUNT :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="treview" class="form-control" value="{{item['text_reviews_count']}}">
+                                                </div>
+                                              </div>
+                                               <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">PUBLICATION DATE :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="pdate" class="form-control" value="{{item['publication_date']}}">
+                                                </div>
+                                              </div>
+                                              <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">PUBLISHER :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="publisher" class="form-control" value="{{item['publisher']}}">
+                                                </div>
+                                              </div>
+                                                 <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">STOCK :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="stock" class="form-control" value="{{item['stock']}}" readonly>
+                                                </div>
+                                              </div>
+                                          <div class="modal-footer">
+                                            <button type="button" data-dismiss="modal" class="btn btn-danger" >Close</button>
+                                            <button type="reset" class="btn btn-secondary" >Clear</button>
+                                            <button type="submit" name="update" value="{{item['book_id']}}"class="btn btn-primary" >Save changes</button>
+                                          </div>
+                                          
+                                       
+                                        </div>
+                                      </form>
+                                      </div>
+                                    </div>
+                                  </div>
+{%endfor%}
+
+<!-- Modal Box Ended for updating details -->
+
+
+
+<!-- Modal body for fetching details of new books -->
+
+    <div class="modal fade" id="add" tabindex="-1" role="dialog" aria-labelledby="add" aria-hidden="true">
+                                      <div class="modal-dialog modal-lg" role="document">
+                                        <div class="modal-content">
+                                           
+                                          <div class="modal-header">
+                                            <h5 class="modal-title" id="add">ADD BOOKS</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                         
+                                          <form method="POST" action="{{url_for('book')}}">
+                                          <div class="modal-body">
+                                              <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">NO. OF BOOKS :</label>
+                                                <div class="col-md-6">
+                                                  <input type="number" name="nbooks"  class="form-control" min="1" required>
+                                                </div>
+                                           </div>
+                                              <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">TITLE :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="title" class="form-control">
+                                                </div>
+                                           </div>
+                                              <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">AUTHORS :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="author" class="form-control">
+                                                </div>
+                                              </div>
+                                             <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">ISBN :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="isbn" class="form-control">
+                                                </div>
+                                              </div>
+                                              <div class="form-group row">
+                                                <label class="col-md-6 col-form-label">PUBLISHER :</label>
+                                                <div class="col-md-6">
+                                                  <input type="text" name="publisher" class="form-control">
+                                                </div>
+                                              </div>
+                                          <div class="modal-footer">
+                                            <button type="button" data-dismiss="modal" class="btn btn-danger" >Close</button>
+                                            <button type="reset" class="btn btn-secondary" >Clear</button>
+                                            <button type="submit" name="add" class="btn btn-primary" >Save changes</button>
+                                          </div>
+                                        
+                                        </div>
+                                      </div>
+                                    </form>
+            </div>
+          </div>
+        </div>
+
+<!-- Modal Box Ended for adding new books -->
+
+</div>
+</div>
+<!-- div end -->
+
+
+<!-- Function for searching the elements in the table data -->
+
+<script>
+function myFunction() {
+  var input, filter, table, tr, td, i;
+  input = document.getElementById("search");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("Mytable");
+  var rows = table.getElementsByTagName("tr");
+  for (i = 0; i < rows.length; i++) {
+    var cells = rows[i].getElementsByTagName("td");
+    var j;
+    var rowContainsFilter = false;
+    for (j = 0; j < cells.length; j++) {
+      if (cells[j]) {
+        if (cells[j].innerHTML.toUpperCase().indexOf(filter) > -1) {
+          rowContainsFilter = true;
+          continue;
+        }
+      }
+    }
+
+    if (! rowContainsFilter) {
+      rows[i].style.display = "none";
+    } else {
+      rows[i].style.display = "";
+    }
+  }
+}
+</script>
+
+<!-- Function Ended -->
+
+
+{% endblock %}

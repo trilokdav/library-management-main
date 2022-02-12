@@ -1,0 +1,51 @@
+<!-- Login Template for the guest user -->
+
+<html>
+<head>
+<title>
+Login
+</title>
+<link href="{{url_for('static',filename='dashboard/login/login.css')}}" rel="stylesheet" />
+ <link rel="apple-touch-icon" sizes="76x76" href="{{url_for('static',filename='dashboard/img/apple-icon.png')}}">
+  <link rel="icon" type="image/png" href="{{url_for('static',filename='dashboard/img/favicon.png')}}">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <title>
+    Check Books
+  </title>
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
+  <!--     Fonts and icons     -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+  <!-- CSS Files -->
+  <link href="{{url_for('static',filename='dashboard/css/bootstrap.min.css')}}" rel="stylesheet" />
+  <link href="{{url_for('static',filename='dashboard/css/paper-dashboard.css')}}" rel="stylesheet" />
+</head>
+<body style="background-color: #50a3a2;">
+
+
+<div class="wrapper">
+
+				<center>
+		<div class="card" style="margin-top:300px; width:500px;">
+
+			<div class="card-body">
+				<div class="card-title">
+					<h3>Login</h3>
+					<hr></hr>
+				</div>
+		
+		<form method="POST" action="{{url_for('login')}}">
+			<input type="email"  name ="email" placeholder="Enter Email" class="form-control">
+		</br>
+			<button type="submit" name="check" class="btn btn-success">Login</button>
+		</form>
+	</div>
+</div>
+</center>
+</div>
+
+</div>
+</body>
+</html>
+
+<!-- Template ended -->

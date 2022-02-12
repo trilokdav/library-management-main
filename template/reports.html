@@ -1,0 +1,343 @@
+{% extends 'dashboard.html' %}
+
+{% block nav_report %}class = "active" {% endblock %}
+{% block content %}
+
+ <!-- Navbar -->
+
+ <div class="container">
+  <div class="row">
+       <form method="POST" action="{{url_for('report')}}">
+      <nav class="navbar navbar-expand-lg navbar-absolute fixed-top navbar-transparent">
+        <div class="container-fluid">
+          <div class="navbar-wrapper">
+            <div class="navbar-toggle">
+              <button type="button" class="navbar-toggler">
+                <span class="navbar-toggler-bar bar1"></span>
+                <span class="navbar-toggler-bar bar2"></span>
+                <span class="navbar-toggler-bar bar3"></span>
+              </button>
+            </div>
+            <a class="navbar-brand" href="javascript:;">Reports</a>
+          </div>
+          <div class="col-md-8">
+         <button type="submit" class="btn btn-danger" name="report1">report1</button>
+          <button type="submit" class="btn btn-danger" name="report2">report2</button>
+       </div>
+        
+          <div class="collapse navbar-collapse justify-content-end" id="navigation">
+           
+              <div class="input-group no-border">
+                <input type="text" id="search" onkeyup="myFunction()" name="search" class="form-control" placeholder="Search...">
+                <div class="input-group-append">
+                  <div class="input-group-text">
+                    <i class="nc-icon nc-zoom-split"></i>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </nav>
+    </form>
+
+<!-- Ending for navbar -->
+{% if maxdata or bookdata%}
+
+<div class="row">
+        <iframe id="txtArea1" style="display:none"></iframe>
+        &nbsp
+        &nbsp&nbsp
+        <div class="col">
+            <button id="pdf" class="btn btn-primary" name="Report" onclick="printDiv()">Save as PDF &nbsp<i class="fa fa-file-pdf"></i></button>
+        
+            <button id="excel" class="btn btn-primary" name="excel" onclick="fnExcelReport();">Save as Excelsheet &nbsp<i class="fa fa-file-excel"></i></button>
+
+              {% if tvalue %}
+          <button class="btn btn-primary" type="button" onclick="charts();">View Chart</button>
+          {%elif tissue %}
+         <button class="btn btn-primary" type="button" onclick="scharts();">View Chart</button>
+          {% endif %}
+        
+        </div>
+    </div>
+  {% endif %} 
+
+<div class="container-fluid"> 
+<div class="row">
+<div class="col"> 
+
+<div id="printdivision">
+<form method="POST" action="{{url_for('report')}}">
+ {% if maxdata %}
+<div class="card" style="width:1100px;">
+  <div class="card-body">
+    
+       <div class="table-responsive">
+       
+      <!-- Table for displaying data -->
+      <table class="table table-hover table-bordered" id="Mytable">
+	     <thead style="font-weight: bold;" class="text-primary">
+		      <td>Member Id</td>
+		      <td>Member Name</td>
+		      <td>Member Phone</td>
+          <td>Member Email</td>
+		      <td>Address</td>
+		      <td>Total Amount</td>
+		      
+	   </thead>
+	{% for i in maxdata %}
+      <tbody >
+	     <tr>
+		    <td style="font-weight: bold;" class="text-danger">{{ i['member_id' ] }}</td>
+		    <td>{{ i['member_name'] }}</td>
+		    <td>{{ i['member_phone'] }}</td>
+        <td>{{ i['member_email'] }}</td>
+		    <td>{{ i['member_address'] }}</td>
+        <td style="font-weight: bold;" class="text-success">{{i['total_amount']}}</td>
+	   </tr>
+    </tbody>
+{% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+     
+  {%elif bookdata %}
+
+      <div class="card" style="width:1100px;">
+        <div class="card-body">
+        <div class="table-responsive">
+      <!-- Table for displaying data -->
+      <table class="table table-hover table-bordered" id="Mytable" >
+       <thead style="font-weight: bold;" class="text-primary">
+          <td>Book Id</td>
+          <td>Title</td>
+          <td>Publisher</td>
+          <td>No of times Issued</td>
+          <td>In Stock</td>
+          <td>Total Books</td>
+
+          
+     </thead>
+  {% for i in bookdata %}
+      <tbody >
+       <tr>
+        <td style="font-weight: bold;" class="text-danger">{{ i['book_id' ] }}</td>
+        <td>{{ i['title'] }}</td>
+        <td>{{ i['publisher'] }}</td>
+        <td style="font-weight: bold;" class="text-success">{{ i['count(t.book_id)'] }}</td>
+        <td>{{ i['stock'] }}</td>
+        <td>{{i['total']}}</td>
+     </tr>
+    </tbody>
+{% endfor %}
+      </table>
+         
+{%endif%}
+</div>
+  </div>
+</div>
+</form>
+</div>
+{% if maxdata %}
+<div class="card" style="width:1100px;">
+  <div class="card-body">
+    <canvas id="fChart" width="400" height="100"></canvas>
+  </div>
+  </div>
+  {% elif bookdata%}
+  <div class="card">
+  <div class="card-body" style="width:1100px;">
+    <canvas id="sChart" width="400" height="100"></canvas>
+  </div>
+  </div>
+  {% endif %}
+</div>
+</div>
+</div>
+
+
+<!-- ------------------------------------------------------------------------------------ -->
+
+<!-- Function for download the report in pdf format -->
+<script type="text/javascript">
+function printDiv() 
+    { 
+        var divContents = document.getElementById("printdivision").innerHTML; 
+        var reportname = document.getElementById("pdf").name;
+        var a = window.open('', '', 'height=1080, width=1080'); 
+        a.document.write('<html>'); 
+        a.document.write('<body >');
+        a.document.write('<h2> <center>');a.document.write(reportname);a.document.write('</center></h2><br>');
+        a.document.write(divContents);
+        a.document.write('</body></html>'); 
+        a.document.close(); 
+        a.print(); 
+    } 
+
+
+    //Function to download Report in EXCEL sheet
+
+    function fnExcelReport()
+    {
+        var tab_text="<table border='2px'><tr bgcolor='#87AFC6'>";
+        var textRange; var j=0;
+        tab = document.getElementById('Mytable'); // id of table
+
+        for(j = 0 ; j < tab.rows.length ; j++) 
+        {     
+            tab_text=tab_text+tab.rows[j].innerHTML+"</tr>";
+        }
+
+        tab_text=tab_text+"</table>";
+        tab_text= tab_text.replace(/<A[^>]*>|<\/A>/g, "");//remove if u want links in your table
+        tab_text= tab_text.replace(/<img[^>]*>/gi,""); // remove if u want images in your table
+
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE "); 
+
+        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))// If Internet Explorer
+        {
+            txtArea1.document.open("txt/html","replace");
+            txtArea1.document.write(tab_text);
+            txtArea1.document.close();
+            txtArea1.focus(); 
+            sa=txtArea1.document.execCommand("SaveAs",true,"Thanks");
+        }  
+        else                 //other browser not tested on IE 11
+            sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));  
+
+        return (sa);
+    }
+</script>
+
+<!-- Function ended -->
+
+<!-- ------------------------------------------------------------------------------------ -->
+
+
+<!-- Function for searching the elements in the table data -->
+
+<script>
+function myFunction() {
+  var input, filter, table, tr, td, i;
+  input = document.getElementById("search");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("Mytable");
+  var rows = table.getElementsByTagName("tr");
+  for (i = 0; i < rows.length; i++) {
+    var cells = rows[i].getElementsByTagName("td");
+    var j;
+    var rowContainsFilter = false;
+    for (j = 0; j < cells.length; j++) {
+      if (cells[j]) {
+        if (cells[j].innerHTML.toUpperCase().indexOf(filter) > -1) {
+          rowContainsFilter = true;
+          continue;
+        }
+      }
+    }
+
+    if (! rowContainsFilter) {
+      rows[i].style.display = "none";
+    } else {
+      rows[i].style.display = "";
+    }
+  }
+}
+</script>
+
+<!-- Function Ended -->
+
+<!-- ------------------------------------------------------------------------------------ -->
+
+ <!-- Function for displaying chart for first report -->
+
+<script type="text/javascript">
+  function charts()
+  {
+    var speedCanvas = document.getElementById("fChart");
+
+    var dataFirst = {
+      data:[],
+      data:{{tvalue|safe}},
+      fill: false,
+      borderColor: '#fbc658',
+      backgroundColor: 'transparent',
+      pointBorderColor: '#fbc658',
+      pointRadius: 4,
+      pointHoverRadius: 4,
+      pointBorderWidth: 8,
+    };
+    console.log({{tvalue}});
+
+    var speedData = {
+      labels: [],
+      labels:{{mname|safe}},
+      datasets: [dataFirst]
+    };
+
+    var chartOptions = {
+      legend: {
+        display: false,
+        position: 'top'
+      }
+    };
+
+    var lineChart = new Chart(speedCanvas, {
+      type: 'line',
+      hover: false,
+      data: speedData,
+      options: chartOptions
+    });
+  }
+</script>
+ <!-- Function ended -->
+
+ <!-- ---------------------------------------------------------------------------------------- -->
+
+ <!--  Function for displaying chart for second record -->
+
+<script type="text/javascript">
+  function scharts()
+  {
+    var speedCanvas = document.getElementById("sChart");
+
+    var dataFirst = {
+      data:[],
+      data:{{tissue|safe}},
+      fill: false,
+      borderColor: '#fbc658',
+      backgroundColor: 'transparent',
+      pointBorderColor: '#fbc658',
+      pointRadius: 4,
+      pointHoverRadius: 4,
+      pointBorderWidth: 8,
+    };
+    console.log({{tissue}});
+
+    var speedData = {
+      labels: [],
+      labels:{{bname|safe}},
+      datasets: [dataFirst]
+    };
+
+    var chartOptions = {
+      legend: {
+        display: false,
+        position: 'top'
+      }
+    };
+
+    var lineChart = new Chart(speedCanvas, {
+      type: 'line',
+      hover: false,
+      data: speedData,
+      options: chartOptions
+    });
+  }
+</script>
+
+
+ <!-- Function ended -->
+{%endblock%}
